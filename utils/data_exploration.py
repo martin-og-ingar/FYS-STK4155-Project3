@@ -4,6 +4,11 @@ import seaborn as sns
 from statsmodels.tsa.stattools import adfuller
 
 df = pd.read_csv("data/alagoas_dataset.csv")
+plt.figure(figsize=(10, 6))
+plt.title("Disease cases in Alagoas")
+plt.ylabel("disease_cases")
+
+plt.plot(df["disease_cases"])
 
 print(df.describe())
 

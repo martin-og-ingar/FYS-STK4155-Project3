@@ -7,9 +7,10 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import Ridge, LinearRegression
 import joblib
 from sklearn.tree import DecisionTreeRegressor
+from utils import generate_subtitle, plot_results
 
 
-def train(model, hyper_params):
+def train(model_name, hyper_params, plot_number):
 
     df = pd.read_csv("data/train.csv")
 
@@ -34,7 +35,7 @@ def train(model, hyper_params):
     splits = 5
     poly = None
 
-    match model:
+    match model_name:
         case "ridge":
             poly = PolynomialFeatures(degree=hyper_params["poly_degree"])
             X_scaled = poly.fit_transform(X_scaled)
@@ -73,10 +74,6 @@ def train(model, hyper_params):
         y_train = y_train.values.ravel()
         y_test = y_test.values.ravel()
 
-        print(
-            f"Fold {fold}: Training on {X_train.shape[0]} samples, Testing on {X_test.shape[0]} samples"
-        )
-
         model.fit(X_train, y_train)
 
         y_pred = model.predict(X_test)
@@ -86,4 +83,23 @@ def train(model, hyper_params):
 
         mse_scores.append(mse)
         r2_scores.append(r2)
+
+    # Create plot
+    x_train, x_test, y_train, y_test = train_test_split(
+        X_scaled, y, train_size=0.8, shuffle=False
+    )
+    y_train = y_train.values.ravel()
+    y_test = y_test.values.ravel()
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    plot_subtitle = generate_subtitle(
+        hyper_params, np.mean(mse_scores), np.mean(r2_scores)
+    )
+    plot_results(
+        model_name,
+        y_test,
+        y_pred,
+        f"figures/{model_name}/{plot_number}.png",
+        plot_subtitle,
+    )
     return model, np.mean(mse_scores), np.mean(r2_scores), scaler, poly
