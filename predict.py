@@ -1,7 +1,8 @@
 import joblib
 import pandas as pd
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import root_mean_squared_error, r2_score
 import sys
+from utils import plot_results, generate_subtitle
 
 
 def predict(model_name):
@@ -27,13 +28,40 @@ def predict(model_name):
         X_scaled = poly.transform(X_scaled)
 
     pred = model.predict(X_scaled)
-    mse = mean_squared_error(Y, pred)
+    rmse = root_mean_squared_error(Y, pred)
     r2 = r2_score(Y, pred)
 
     df["pred cases"] = pred
     df.to_csv(f"data/{model_name}_predictions.csv", index=False)
 
-    return mse, r2
+    match model_name:
+        case "ridge":
+            hyper_params = {"lmb": model.alpha, "poly_degree": poly.degree}
+        case "dt":
+            hyper_params = {
+                "max_depth": model.max_depth,
+                "min_samples_split": model.min_samples_split,
+            }
+        case "rf":
+            hyper_params = {
+                "max_depth": model.max_depth,
+                "min_samples_split": model.min_samples_split,
+                "n_estimators": model.n_estimators,
+            }
+        case "bagging":
+            hyper_params = {
+                "n_estimators": model.n_estimators,
+                "max_features": model.max_features,
+                "max_samples": model.max_samples,
+            }
+    subtitle = generate_subtitle(
+        hyper_params=hyper_params, rmse=rmse, r2=r2, mean_rmse=None, mean_r2=None
+    )
+    plot_results(
+        model_name, plot_fn=f"figures/test/{model_name}.png", subtitle=subtitle
+    )
+
+    return rmse, r2
 
 
 if __name__ == "__main__":
