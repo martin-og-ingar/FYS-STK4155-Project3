@@ -4,7 +4,7 @@ from predict import predict
 import sys
 import pandas as pd
 
-from utils import plot_rmse, plot_scores
+from utils import plot_scores
 
 # Hyper params to be evaluated
 LMB_VALUES = [0.0001, 0.001, 0.01, 0.1]

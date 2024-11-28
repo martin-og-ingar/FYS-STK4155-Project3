@@ -1,3 +1,4 @@
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import BaggingRegressor, RandomForestRegressor
@@ -51,12 +52,18 @@ def train(model_name, hyper_params, plot_number):
                 min_samples_split=hyper_params["min_samples_split"],
                 n_estimators=hyper_params["num_trees"],
                 criterion="absolute_error",
+                random_state=42,
             )
         case "bagging":
+            dt_model = joblib.load("models/dt.pkl")
+            if dt_model is None:
+                dt_model = DecisionTreeRegressor()
             model = BaggingRegressor(
+                dt_model,
                 n_estimators=hyper_params["num_trees"],
                 max_samples=hyper_params["max_samples"],
-                max_features=hyper_params["max_samples"],
+                max_features=hyper_params["max_features"],
+                random_state=42,
             )
 
     # Time series cross validation
