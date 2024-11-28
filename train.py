@@ -57,7 +57,6 @@ def train(model_name, hyper_params, plot_number):
                 n_estimators=hyper_params["num_trees"],
                 max_samples=hyper_params["max_samples"],
                 max_features=hyper_params["max_samples"],
-                criterion="absolute_error",
             )
 
     # Time series cross validation
