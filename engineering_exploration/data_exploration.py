@@ -7,7 +7,7 @@ import seaborn as sns
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.ensemble import BaggingRegressor
 from sklearn.metrics import root_mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
 
@@ -106,44 +106,11 @@ results = []
 NUM_TREES = [10, 50, 100, 200, 300]
 MAX_SAMPLES = [0.5, 0.75, 1.0]
 MAX_FEAUTRES = [0.5, 0.75, 1.0]
-MAX_DEPTHS = [5, 10, 15]
-MIN_SAMPLE_SPLITS = [5, 10, 15]
-best_rmse = float("inf")
-for i in NUM_TREES:
-    for j in MAX_SAMPLES:
-        for k in MAX_FEAUTRES:
-            for l in MAX_DEPTHS:
-                for p in MIN_SAMPLE_SPLITS:
-                    model = BaggingRegressor(
-                        n_estimators=i,
-                        max_samples=j,
-                        max_features=k,
-                        # estimator=DecisionTreeRegressor(
-                        #     max_depth=l, min_samples_split=p, criterion="absolute_error"
-                        # ),
-                    )
-                    model.fit(x_train, y_train)
-                    y_pred = model.predict(x_test)
-                    rmse = root_mean_squared_error(y_test, y_pred)
-                    if rmse < best_rmse:
-                        current_model = model
+MAX_DEPTHS = [5, 10, 15, 30, 45]
+MIN_SAMPLE_SPLITS = [2, 3, 5, 10, 15]
 
-df = pd.read_csv("data/test.csv")
-features = [
-    "rainfall",
-    "mean_temperature",
-    "disease_cases_ma_3",
-    "rainfall_ma_3",
-    "mean_temperature_ma_3",
-    "disease_cases_lag",
-]
-Y = df["disease_cases"]
-X = df[features]
-
-X_scaled = scaler.transform(X)
-
-y_pred = current_model.predict(X)
-rmse = root_mean_squared_error(Y, y_pred)
-r2 = r2_score(Y, y_pred)
-print(rmse)
-print(r2)
+param_grid = {"max"}
+dtree = DecisionTreeRegressor(random_state=42)
+grid_search = GridSearchCV(
+    dtree,
+)
